@@ -15,7 +15,7 @@ type CascSpec struct {
 	Secret         SecretRef      `json:"secret"`
 	Configurations []ConfigMapRef `json:"configurations"`
 
-	JenkinsRef 	   JenkinsRef 	  `json:"jenkinsRef"`
+	JenkinsRef JenkinsRef `json:"jenkinsRef"`
 }
 
 // SecretRef is reference to Kubernetes secret.

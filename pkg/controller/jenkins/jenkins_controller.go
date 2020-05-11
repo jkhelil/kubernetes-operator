@@ -12,7 +12,6 @@ import (
 	"github.com/jenkinsci/kubernetes-operator/pkg/controller/jenkins/configuration"
 	"github.com/jenkinsci/kubernetes-operator/pkg/controller/jenkins/configuration/base"
 	"github.com/jenkinsci/kubernetes-operator/pkg/controller/jenkins/configuration/base/resources"
-	"github.com/jenkinsci/kubernetes-operator/pkg/controller/jenkins/configuration/user"
 	"github.com/jenkinsci/kubernetes-operator/pkg/controller/jenkins/constants"
 	"github.com/jenkinsci/kubernetes-operator/pkg/controller/jenkins/notifications/event"
 	"github.com/jenkinsci/kubernetes-operator/pkg/controller/jenkins/notifications/reason"
@@ -288,56 +287,58 @@ func (r *ReconcileJenkins) reconcile(request reconcile.Request, logger logr.Logg
 		}
 		logger.Info(message)
 	}
-	// Reconcile user configuration
-	userConfiguration := user.New(config, jenkinsClient, logger)
+	/*
+		// Reconcile user configuration
+		userConfiguration := user.New(config, jenkinsClient, logger)
 
-	var messages []string
-	messages, err = userConfiguration.Validate(jenkins)
-	if err != nil {
-		return reconcile.Result{}, jenkins, err
-	}
-	if len(messages) > 0 {
-		message := "Validation of user configuration failed, please correct Jenkins CR"
-		*r.notificationEvents <- event.Event{
-			Jenkins: *jenkins,
-			Phase:   event.PhaseUser,
-			Level:   v1alpha2.NotificationLevelWarning,
-			Reason:  reason.NewUserConfigurationFailed(reason.HumanSource, []string{message}, append([]string{message}, messages...)...),
-		}
-
-		logger.V(log.VWarn).Info(message)
-		for _, msg := range messages {
-			logger.V(log.VWarn).Info(msg)
-		}
-		return reconcile.Result{}, jenkins, nil // don't requeue
-	}
-
-	result, err = userConfiguration.Reconcile()
-	if err != nil {
-		return reconcile.Result{}, jenkins, err
-	}
-	if result.Requeue {
-		return result, jenkins, nil
-	}
-
-	if jenkins.Status.UserConfigurationCompletedTime == nil {
-		now := metav1.Now()
-		jenkins.Status.UserConfigurationCompletedTime = &now
-		err = r.client.Update(context.TODO(), jenkins)
+		var messages []string
+		messages, err = userConfiguration.Validate(jenkins)
 		if err != nil {
-			return reconcile.Result{}, jenkins, errors.WithStack(err)
+			return reconcile.Result{}, jenkins, err
 		}
-		message := fmt.Sprintf("User configuration phase is complete, took %s",
-			jenkins.Status.UserConfigurationCompletedTime.Sub(jenkins.Status.ProvisionStartTime.Time))
-		*r.notificationEvents <- event.Event{
-			Jenkins: *jenkins,
-			Phase:   event.PhaseUser,
-			Level:   v1alpha2.NotificationLevelInfo,
-			Reason:  reason.NewUserConfigurationComplete(reason.OperatorSource, []string{message}),
-		}
-		logger.Info(message)
-	}
+		if len(messages) > 0 {
+			message := "Validation of user configuration failed, please correct Jenkins CR"
+			*r.notificationEvents <- event.Event{
+				Jenkins: *jenkins,
+				Phase:   event.PhaseUser,
+				Level:   v1alpha2.NotificationLevelWarning,
+				Reason:  reason.NewUserConfigurationFailed(reason.HumanSource, []string{message}, append([]string{message}, messages...)...),
+			}
 
+			logger.V(log.VWarn).Info(message)
+			for _, msg := range messages {
+				logger.V(log.VWarn).Info(msg)
+			}
+			return reconcile.Result{}, jenkins, nil // don't requeue
+		}
+
+		result, err = userConfiguration.Reconcile()
+		if err != nil {
+			return reconcile.Result{}, jenkins, err
+		}
+		if result.Requeue {
+			return result, jenkins, nil
+		}
+
+		if jenkins.Status.UserConfigurationCompletedTime == nil {
+			now := metav1.Now()
+			jenkins.Status.UserConfigurationCompletedTime = &now
+			err = r.client.Update(context.TODO(), jenkins)
+			if err != nil {
+				return reconcile.Result{}, jenkins, errors.WithStack(err)
+			}
+			message := fmt.Sprintf("User configuration phase is complete, took %s",
+				jenkins.Status.UserConfigurationCompletedTime.Sub(jenkins.Status.ProvisionStartTime.Time))
+			*r.notificationEvents <- event.Event{
+				Jenkins: *jenkins,
+				Phase:   event.PhaseUser,
+				Level:   v1alpha2.NotificationLevelInfo,
+				Reason:  reason.NewUserConfigurationComplete(reason.OperatorSource, []string{message}),
+			}
+			logger.Info(message)
+		}
+
+	*/
 	return reconcile.Result{}, jenkins, nil
 }
 

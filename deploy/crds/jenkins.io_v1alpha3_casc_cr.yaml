@@ -4,4 +4,7 @@ metadata:
   name: example-casc
 spec:
   # Add fields here
-  size: 3
+  configurations:
+  - name: example
+  jenkinsRef:
+    name: example
