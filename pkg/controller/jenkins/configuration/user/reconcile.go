@@ -3,6 +3,9 @@ package user
 import (
 	"strings"
 
+	"github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2"
+
+	"github.com/go-logr/logr"
 	jenkinsclient "github.com/jenkinsci/kubernetes-operator/pkg/controller/jenkins/client"
 	"github.com/jenkinsci/kubernetes-operator/pkg/controller/jenkins/configuration"
 	"github.com/jenkinsci/kubernetes-operator/pkg/controller/jenkins/configuration/backuprestore"
@@ -11,8 +14,6 @@ import (
 	"github.com/jenkinsci/kubernetes-operator/pkg/controller/jenkins/configuration/user/seedjobs"
 	"github.com/jenkinsci/kubernetes-operator/pkg/controller/jenkins/groovy"
 	"github.com/jenkinsci/kubernetes-operator/pkg/log"
-	"github.com/go-logr/logr"
-
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
@@ -20,6 +21,7 @@ import (
 type ReconcileUserConfiguration interface {
 	ReconcileCasc() (reconcile.Result, error)
 	ReconcileOthers() (reconcile.Result, error)
+	Validate(jenkins *v1alpha2.Jenkins) ([]string, error)
 }
 
 type reconcileUserConfiguration struct {

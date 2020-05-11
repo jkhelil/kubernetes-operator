@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"text/template"
 
+	"github.com/go-logr/logr"
 	"github.com/jenkinsci/kubernetes-operator/internal/render"
 	"github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2"
 	jenkinsclient "github.com/jenkinsci/kubernetes-operator/pkg/controller/jenkins/client"
@@ -17,7 +18,6 @@ import (
 	"github.com/jenkinsci/kubernetes-operator/pkg/controller/jenkins/groovy"
 	"github.com/jenkinsci/kubernetes-operator/pkg/controller/jenkins/notifications/reason"
 	"github.com/jenkinsci/kubernetes-operator/pkg/log"
-	"github.com/go-logr/logr"
 	stackerr "github.com/pkg/errors"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -152,6 +152,11 @@ type SeedJobs interface {
 	getAllSeedJobIDs(jenkins v1alpha2.Jenkins) []string
 	isRecreatePodNeeded(jenkins v1alpha2.Jenkins) bool
 	createAgent(jenkinsClient jenkinsclient.Jenkins, k8sClient client.Client, jenkinsManifest *v1alpha2.Jenkins, namespace string, agentName string) error
+	ValidateSeedJobs(jenkins v1alpha2.Jenkins) ([]string, error)
+	validateSchedule(job v1alpha2.SeedJob, str string, key string) []string
+	validateGitHubPushTrigger(jenkins v1alpha2.Jenkins) []string
+	validateBitbucketPushTrigger(jenkins v1alpha2.Jenkins) []string
+	validateIfIDIsUnique(seedJobs []v1alpha2.SeedJob) []string
 }
 
 type seedJobs struct {

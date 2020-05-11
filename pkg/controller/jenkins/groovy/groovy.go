@@ -37,7 +37,7 @@ func New(jenkinsClient jenkinsclient.Jenkins, k8sClient k8s.Client, jenkins *v1a
 		jenkins:           jenkins,
 		configurationType: configurationType,
 		customization:     customization,
-		logger:        	   log.Log.WithValues("cr", jenkins.Name),
+		logger:            log.Log.WithValues("cr", jenkins.Name),
 	}
 }
 

@@ -15,7 +15,7 @@ import (
 const groovyUtf8MaxStringLength = 65535
 
 // ConfigurationAsCode defines client for configurationAsCode
-type ConfigurationAsCode  interface {
+type ConfigurationAsCode interface {
 	Ensure(jenkins *v1alpha2.Jenkins) (requeue bool, err error)
 }
 
