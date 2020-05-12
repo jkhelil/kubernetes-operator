@@ -3,6 +3,7 @@ package jenkins
 import (
 	"context"
 	"fmt"
+	"github.com/jenkinsci/kubernetes-operator/pkg/controller/jenkins/configuration/user"
 	"math/rand"
 	"reflect"
 	"time"
@@ -287,9 +288,9 @@ func (r *ReconcileJenkins) reconcile(request reconcile.Request, logger logr.Logg
 		}
 		logger.Info(message)
 	}
-	/*
-		// Reconcile user configuration
-		userConfiguration := user.New(config, jenkinsClient, logger)
+
+		// Reconcile seedjobs and backups
+		userConfiguration := user.New(config, jenkinsClient)
 
 		var messages []string
 		messages, err = userConfiguration.Validate(jenkins)
@@ -312,7 +313,7 @@ func (r *ReconcileJenkins) reconcile(request reconcile.Request, logger logr.Logg
 			return reconcile.Result{}, jenkins, nil // don't requeue
 		}
 
-		result, err = userConfiguration.Reconcile()
+		result, err = userConfiguration.ReconcileOthers()
 		if err != nil {
 			return reconcile.Result{}, jenkins, err
 		}
@@ -338,7 +339,6 @@ func (r *ReconcileJenkins) reconcile(request reconcile.Request, logger logr.Logg
 			logger.Info(message)
 		}
 
-	*/
 	return reconcile.Result{}, jenkins, nil
 }
 

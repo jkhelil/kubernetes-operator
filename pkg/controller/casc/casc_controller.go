@@ -15,7 +15,6 @@ import (
 	"k8s.io/client-go/rest"
 
 	jenkinsv1alpha3 "github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha3"
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -153,7 +152,7 @@ func (r *ReconcileCasc) Reconcile(request reconcile.Request) (reconcile.Result, 
 	reqLogger.Info("Jenkins API client set")
 
 	// Reconcile user configuration
-	userConfiguration := user.New(config, jenkinsClient, reqLogger)
+	userConfiguration := user.New(config, jenkinsClient)
 	var messages []string
 	messages, err = userConfiguration.Validate(jenkins)
 	if err != nil {
@@ -175,7 +174,7 @@ func (r *ReconcileCasc) Reconcile(request reconcile.Request) (reconcile.Result, 
 		return reconcile.Result{}, nil // don't requeue
 	}
 
-	result, err := userConfiguration.Reconcile()
+	result, err := userConfiguration.ReconcileCasc()
 	if err != nil {
 		return reconcile.Result{}, err
 	}
@@ -201,55 +200,6 @@ func (r *ReconcileCasc) Reconcile(request reconcile.Request) (reconcile.Result, 
 		reqLogger.Info(message)
 	}
 
-	// Define a new Pod object
-	/*pod := newPodForCR(instance)
-
-	// Set Casc instance as the owner and controller
-	if err := controllerutil.SetControllerReference(instance, pod, r.scheme); err != nil {
-		return reconcile.Result{}, err
-	}
-
-	// Check if this Pod already exists
-	found := &corev1.Pod{}
-	err = r.client.Get(context.TODO(), types.NamespacedName{Name: pod.Name, Namespace: pod.Namespace}, found)
-	if err != nil && errors.IsNotFound(err) {
-		reqLogger.Info("Creating a new Pod", "Pod.Namespace", pod.Namespace, "Pod.Name", pod.Name)
-		err = r.client.Create(context.TODO(), pod)
-		if err != nil {
-			return reconcile.Result{}, err
-		}
-
-		// Pod created successfully - don't requeue
-		return reconcile.Result{}, nil
-	} else if err != nil {
-		return reconcile.Result{}, err
-	}
-
-	// Pod already exists - don't requeue
-	reqLogger.Info("Skip reconcile: Pod already exists", "Pod.Namespace", found.Namespace, "Pod.Name", found.Name)
-	*/
 	return reconcile.Result{}, nil
 }
 
-// newPodForCR returns a busybox pod with the same name/namespace as the cr
-func newPodForCR(cr *jenkinsv1alpha3.Casc) *corev1.Pod {
-	labels := map[string]string{
-		"app": cr.Name,
-	}
-	return &corev1.Pod{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      cr.Name + "-pod",
-			Namespace: cr.Namespace,
-			Labels:    labels,
-		},
-		Spec: corev1.PodSpec{
-			Containers: []corev1.Container{
-				{
-					Name:    "busybox",
-					Image:   "busybox",
-					Command: []string{"sleep", "3600"},
-				},
-			},
-		},
-	}
-}
